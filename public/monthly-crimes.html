@@ -21,6 +21,8 @@
 
     <canvas id="crimeChart" width="200" height="100"></canvas>
 
+    <button id="downloadChartBtn">Download Chart</button>
+
     <script>
         const locationFilter = document.getElementById('locationFilter');
         const crimeTypeFilter = document.getElementById('crimeTypeFilter');
@@ -75,7 +77,14 @@ function prepareChartData(data, selectedLocation, selectedCrimeType) {
         monthlyData[monthYear] += item.totalCrimes;
     });
 
-    const labels = Object.keys(monthlyData).sort();
+    const labels = Object.keys(monthlyData).sort((a, b) => {
+        const [yearA, monthA] = a.split('-').map(Number);
+        const [yearB, monthB] = b.split('-').map(Number);
+        if (yearA !== yearB) {
+            return yearA - yearB;
+        }
+        return monthA - monthB;
+    });
     const values = labels.map(label => monthlyData[label]);
 
     return { labels, values };
@@ -127,6 +136,15 @@ function prepareChartData(data, selectedLocation, selectedCrimeType) {
         }
 
         initialize();
+
+        const downloadChartBtn = document.getElementById('downloadChartBtn');
+        downloadChartBtn.addEventListener('click', () => {
+            const url = crimeChart.toBase64Image();
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'monthly-crime-chart.png';
+            a.click();
+        });
     </script>
 </body>
 </html>

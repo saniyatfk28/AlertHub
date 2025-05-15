@@ -6,15 +6,19 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js CDN :contentReference[oaicite:5]{index=5} -->
 </head>
 <body>
-    <a href="monthly-crimes.html">View Monthly Crime Statistics</a>
-  <h2>Crimes by Area (This Month)</h2>
-  <canvas id="crimeChart" width="300" height="150"></canvas>
+    <div class="container">
+        <a href="monthly-crimes.html">View Monthly Crime Statistics</a>
+        <h2>Crimes by Area (This Month)</h2>
+        <canvas id="crimeChart" width="300" height="150"></canvas>
 
-  <h2>Top 3 Unsafe Locations (This Month)</h2>
-  <ul id="topLocationsList"></ul>
+        <button id="downloadPieChartBtn">Download Pie Chart</button>
 
-  <h2>Top 3 Most Committed Crimes (This Month)</h2>
-  <ul id="topCrimesList"></ul>
+        <h2>Top 3 Unsafe Locations (This Month)</h2>
+        <ul id="topLocationsList"></ul>
+
+        <h2>Top 3 Most Committed Crimes (This Month)</h2>
+        <ul id="topCrimesList"></ul>
+    </div>
 
   <script src="/crime-dashboard.js"></script>
 </body>

@@ -16,8 +16,8 @@ async function createDummyData() {
     console.log('Connected to MongoDB');
 
     // Delete existing users and posts
-    await UserModel.deleteMany({});
-    await PostModel.deleteMany({});
+    // await UserModel.deleteMany({});
+    // await PostModel.deleteMany({});
     console.log('Deleted existing users and posts');
 
     // Create dummy User data

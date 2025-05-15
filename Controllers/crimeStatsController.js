@@ -42,6 +42,46 @@ export const getCrimeStats = async (req, res) => {
   }
 };
 
+export const getTopCrimeStats = async (req, res) => {
+  try {
+    // 1st day of current month
+    const startOfMonth = new Date();
+    startOfMonth.setDate(1);
+    startOfMonth.setHours(0,0,0,0);
+
+    // Aggregate top 3 locations
+    const topLocations = await Post.aggregate([
+      { $match: { createdAt: { $gte: startOfMonth } } },
+      {
+        $group: {
+          _id: '$location',
+          totalCrimes: { $sum: 1 }
+        }
+      },
+      { $sort: { totalCrimes: -1 } },
+      { $limit: 3 }
+    ]);
+
+    // Aggregate top 3 crime types
+    const topCrimes = await Post.aggregate([
+      { $match: { createdAt: { $gte: startOfMonth } } },
+      {
+        $group: {
+          _id: '$crimeType',
+          totalCrimes: { $sum: 1 }
+        }
+      },
+      { $sort: { totalCrimes: -1 } },
+      { $limit: 3 }
+    ]);
+
+    res.json({ topLocations, topCrimes });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+
 export const getMonthlyCrimeStats = async (req, res) => {
   try {
     const monthlyStats = await Post.aggregate([

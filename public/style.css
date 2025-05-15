@@ -3,11 +3,26 @@ body {
     margin: 0;
     padding: 20px;
     background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 800px;
+    width: 100%;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 }
 
 h1 {
     text-align: center;
     color: #333;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 form {
@@ -57,4 +72,41 @@ a {
 
 a:hover {
     text-decoration: underline;
+}
+
+/* Styles for crime-dashboard.html */
+h2 {
+    color: #555;
+    margin-top: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+    font-size: 1.3em;
+}
+
+canvas {
+    margin-bottom: 20px;
+    background-color: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+}
+
+#downloadPieChartBtn {
+    display: block;
+    margin: 10px auto;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+ul li {
+    background-color: #f9f9f9;
+    padding: 12px;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.04);
+    font-size: 1.1em;
+    color: #444;
 }
