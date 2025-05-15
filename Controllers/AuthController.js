@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 
 // Registering a new User
 export const registerUser = async (req, res) => {
-  const { username, password, firstname, lastname } = req.body;
+  const { username, password, firstname, lastname, email, address } = req.body;
 
   const salt = await bcrypt.genSalt(10);
   const hashedPass = await bcrypt.hash(password, salt);
@@ -13,6 +13,8 @@ export const registerUser = async (req, res) => {
     password: hashedPass,
     firstname,
     lastname,
+    email,
+    address,
   });
 
   try {

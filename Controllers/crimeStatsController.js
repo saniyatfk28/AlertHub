@@ -17,8 +17,7 @@ export const getCrimeStats = async (req, res) => {
           totalCrimes: { $sum: 1 }
         }
       },
-      { $sort: { totalCrimes: -1 } },
-      { $limit: 3 } // Limit to top 3 locations
+      { $sort: { totalCrimes: -1 } }
     ]);
 
     // Calculate crime rates (population data should ideally be fetched from a database)
@@ -45,33 +44,13 @@ export const getCrimeStats = async (req, res) => {
 
 export const getMonthlyCrimeStats = async (req, res) => {
   try {
-    const topLocations = await Post.aggregate([
+    const monthlyStats = await Post.aggregate([
       {
         $group: {
           _id: {
             year: { $year: "$createdAt" },
             month: { $month: "$createdAt" },
-            location: "$location"
-          },
-          totalCrimes: { $sum: 1 }
-        }
-      },
-      {
-        $sort: {
-          totalCrimes: -1
-        }
-      },
-      {
-        $limit: 3
-      }
-    ]);
-
-    const topCrimes = await Post.aggregate([
-      {
-        $group: {
-          _id: {
-            year: { $year: "$createdAt" },
-            month: { $month: "$createdAt" },
+            location: "$location",
             crimeType: "$crimeType"
           },
           totalCrimes: { $sum: 1 }
@@ -79,15 +58,14 @@ export const getMonthlyCrimeStats = async (req, res) => {
       },
       {
         $sort: {
+          "_id.year": 1,
+          "_id.month": 1,
           totalCrimes: -1
         }
-      },
-      {
-        $limit: 3
       }
     ]);
 
-    res.json({ topLocations, topCrimes });
+    res.json(monthlyStats);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

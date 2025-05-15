@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Monthly Crime Statistics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Monthly Crime Statistics</h1>
+
+    <div>
+        <label for="locationFilter">Filter by Location:</label>
+        <select id="locationFilter">
+            <option value="">All Locations</option>
+        </select>
+
+        <label for="crimeTypeFilter">Filter by Crime Type:</label>
+        <select id="crimeTypeFilter">
+            <option value="">All Crime Types</option>
+        </select>
+    </div>
+
+    <canvas id="crimeChart" width="200" height="100"></canvas>
+
+    <script>
+        const locationFilter = document.getElementById('locationFilter');
+        const crimeTypeFilter = document.getElementById('crimeTypeFilter');
+        const crimeChartCanvas = document.getElementById('crimeChart');
+        let crimeChart;
+
+        async function fetchData() {
+            try {
+                const response = await fetch('/api/stats/monthly-crime-stats');
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                return [];
+            }
+        }
+
+        function populateFilters(data) {
+            const locations = [...new Set(data.map(item => item._id.location))];
+            const crimeTypes = [...new Set(data.map(item => item._id.crimeType))];
+
+            locations.forEach(location => {
+                const option = document.createElement('option');
+                option.value = location;
+                option.textContent = location;
+                locationFilter.appendChild(option);
+            });
+
+            crimeTypes.forEach(crimeType => {
+                const option = document.createElement('option');
+                option.value = crimeType;
+                option.textContent = crimeType;
+                crimeTypeFilter.appendChild(option);
+            });
+        }
+
+function prepareChartData(data, selectedLocation, selectedCrimeType) {
+    const filteredData = data.filter(item => {
+        if (selectedLocation && item._id.location !== selectedLocation) return false;
+        if (selectedCrimeType && item._id.crimeType !== selectedCrimeType) return false;
+        return true;
+    });
+
+    const monthlyData = {};
+    filteredData.forEach(item => {
+        const year = item._id.year;
+        const month = item._id.month;
+        const monthYear = `${year}-${month}`;
+        if (!monthlyData[monthYear]) {
+            monthlyData[monthYear] = 0;
+        }
+        monthlyData[monthYear] += item.totalCrimes;
+    });
+
+    const labels = Object.keys(monthlyData).sort();
+    const values = labels.map(label => monthlyData[label]);
+
+    return { labels, values };
+}
+
+        function renderChart(labels, values) {
+            if (crimeChart) {
+                crimeChart.destroy();
+            }
+
+            crimeChart = new Chart(crimeChartCanvas, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Total Crimes',
+                        data: values,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 2,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        async function updateChart() {
+            const data = await fetchData();
+            const selectedLocation = locationFilter.value;
+            const selectedCrimeType = crimeTypeFilter.value;
+            const { labels, values } = prepareChartData(data, selectedLocation, selectedCrimeType);
+            renderChart(labels, values);
+        }
+
+        locationFilter.addEventListener('change', updateChart);
+        crimeTypeFilter.addEventListener('change', updateChart);
+
+        async function initialize() {
+            const data = await fetchData();
+            populateFilters(data);
+            updateChart();
+        }
+
+        initialize();
+    </script>
+</body>
+</html>

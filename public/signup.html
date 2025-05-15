@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Sign Up</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <h1>Sign Up</h1>
@@ -9,8 +10,28 @@
         <label for="username">Username:</label>
         <input type="text" id="username" name="username"><br><br>
 
+        <label for="firstname">First Name:</label>
+        <input type="text" id="firstname" name="firstname"><br><br>
+
+        <label for="lastname">Last Name:</label>
+        <input type="text" id="lastname" name="lastname"><br><br>
+
         <label for="email">Email:</label>
         <input type="email" id="email" name="email"><br><br>
+
+        <label for="address">Address:</label>
+        <select id="address" name="address">
+            <option value="Mohammadpur">Mohammadpur</option>
+            <option value="Shantinagar">Shantinagar</option>
+            <option value="Bashabo">Bashabo</option>
+            <option value="Mugda">Mugda</option>
+            <option value="Malibagh">Malibagh</option>
+            <option value="Badda">Badda</option>
+            <option value="Mirput DOH">Mirput DOH</option>
+            <option value="Rampura">Rampura</option>
+            <option value="Aftabnagar">Aftabnagar</option>
+            <option value="Notun Bazar">Notun Bazar</option>
+        </select><br><br>
 
         <label for="password">Password:</label>
         <input type="password" id="password" name="password"><br><br>
@@ -22,16 +43,19 @@
         document.getElementById('signupForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const username = document.getElementById('username').value;
+            const firstname = document.getElementById('firstname').value;
+            const lastname = document.getElementById('lastname').value;
             const email = document.getElementById('email').value;
+            const address = document.getElementById('address').value;
             const password = document.getElementById('password').value;
 
             try {
-                const response = await fetch('/auth/register', {
+                const response = await fetch('/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ username, email, password })
+                    body: JSON.stringify({ username, firstname, lastname, email, address, password })
                 });
 
                 if (response.ok) {
