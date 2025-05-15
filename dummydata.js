@@ -15,6 +15,11 @@ async function createDummyData() {
     });
     console.log('Connected to MongoDB');
 
+    // Delete existing users and posts
+    // await UserModel.deleteMany({});
+    // await PostModel.deleteMany({});
+    console.log('Deleted existing users and posts');
+
     // Create dummy User data
     const users = [];
     for (let i = 0; i < 10; i++) {
@@ -24,6 +29,8 @@ async function createDummyData() {
         firstname: `First${i}`,
         lastname: `Last${i}`,
         isAdmin: i % 2 === 0,
+        email: `user${i}@example.com`,
+        address: `123 Main St, City${i}`
       });
       await newUser.save();
       users.push(newUser);
@@ -32,27 +39,35 @@ async function createDummyData() {
 
     // Create dummy Post data
     const posts = [];
-    const locations = ['Downtown', 'Uptown', 'Midtown', 'Suburbs', 'Industrial', 'Harbor'];
-    const crimeTypes = ['Theft', 'Assault', 'Vandalism', 'Burglary', 'Arson'];
+    const locations = ['Mohammadpur', 'notun bazar', 'malibagh', 'shantinagar'];
+    const crimeTypes = ['theft', 'robbery', 'kidnapping', 'murder'];
 
-    for (let i = 0; i < 10; i++) {
-      let createdAt = new Date(new Date().setDate(new Date().getDate() - Math.random() * 365));
+    for (let i = 0; i < 20; i++) {
       let location = locations[i % locations.length];
       let crimeType = crimeTypes[i % crimeTypes.length];
+      let userId = users[Math.floor(Math.random() * users.length)]._id;
 
-      // Allow same dates for Downtown - Theft
-      if (location === 'Downtown' && crimeType === 'Theft' && i > 0 && Math.random() < 0.3) {
-        createdAt = posts[i - 1].createdAt;
-      }
+      // Get the current date
+      const now = new Date();
+
+      // Get the first day of the current month
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+      // Get the last day of the current month
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+      // Generate a random date between the first and last day of the month
+      const randomDate = new Date(startOfMonth.getTime() + Math.random() * (endOfMonth.getTime() - startOfMonth.getTime()));
 
       const newPost = new PostModel({
         location: location,
         crimeType: crimeType,
-        createdAt: createdAt
+        createdAt: randomDate,
+        userId: userId
       });
       await newPost.save();
       posts.push(newPost);
-      console.log(`Created post: ${newPost.location} - ${newPost.crimeType} - ${createdAt}`);
+      console.log(`Created post: ${newPost.location} - ${newPost.crimeType} - ${randomDate}`);
     }
 
     console.log('Dummy data created successfully');

@@ -21,6 +21,8 @@
 
     <canvas id="crimeChart" width="200" height="100"></canvas>
 
+    <button id="downloadChartBtn">Download Chart</button>
+
     <script>
         const locationFilter = document.getElementById('locationFilter');
         const crimeTypeFilter = document.getElementById('crimeTypeFilter');
@@ -57,27 +59,36 @@
             });
         }
 
-        function prepareChartData(data, selectedLocation, selectedCrimeType) {
-            const filteredData = data.filter(item => {
-                if (selectedLocation && item._id.location !== selectedLocation) return false;
-                if (selectedCrimeType && item._id.crimeType !== selectedCrimeType) return false;
-                return true;
-            });
+function prepareChartData(data, selectedLocation, selectedCrimeType) {
+    const filteredData = data.filter(item => {
+        if (selectedLocation && item._id.location !== selectedLocation) return false;
+        if (selectedCrimeType && item._id.crimeType !== selectedCrimeType) return false;
+        return true;
+    });
 
-            const monthlyData = {};
-            filteredData.forEach(item => {
-                const monthYear = `${item._id.year}-${item._id.month}`;
-                if (!monthlyData[monthYear]) {
-                    monthlyData[monthYear] = 0;
-                }
-                monthlyData[monthYear] += item.totalCrimes;
-            });
-
-            const labels = Object.keys(monthlyData).sort();
-            const values = labels.map(label => monthlyData[label]);
-
-            return { labels, values };
+    const monthlyData = {};
+    filteredData.forEach(item => {
+        const year = item._id.year;
+        const month = item._id.month;
+        const monthYear = `${year}-${month}`;
+        if (!monthlyData[monthYear]) {
+            monthlyData[monthYear] = 0;
         }
+        monthlyData[monthYear] += item.totalCrimes;
+    });
+
+    const labels = Object.keys(monthlyData).sort((a, b) => {
+        const [yearA, monthA] = a.split('-').map(Number);
+        const [yearB, monthB] = b.split('-').map(Number);
+        if (yearA !== yearB) {
+            return yearA - yearB;
+        }
+        return monthA - monthB;
+    });
+    const values = labels.map(label => monthlyData[label]);
+
+    return { labels, values };
+}
 
         function renderChart(labels, values) {
             if (crimeChart) {
@@ -125,6 +136,15 @@
         }
 
         initialize();
+
+        const downloadChartBtn = document.getElementById('downloadChartBtn');
+        downloadChartBtn.addEventListener('click', () => {
+            const url = crimeChart.toBase64Image();
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'monthly-crime-chart.png';
+            a.click();
+        });
     </script>
 </body>
 </html>
