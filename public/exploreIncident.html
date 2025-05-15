@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Incident Filter</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f4f4f4;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .search-bar {
+      display: flex;
+      margin-bottom: 20px;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .search-inputs {
+      display: flex;
+    }
+    .search-bar input[type="text"] {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      outline: none;
+      flex: 1;
+    }
+    .search-bar select {
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-left: 10px;
+      outline: none;
+    }
+    .incident-list, .post-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      border-top: 1px solid #ddd;
+    }
+    .incident-list li, .post-list li {
+      padding: 10px 70px 10px 10px; /* increased right padding to avoid overlap */
+      border-bottom: 1px solid #ddd;
+      cursor: pointer;
+      position: relative;
+      white-space: normal;
+      word-wrap: break-word;
+    }
+    .incident-list li:hover, .post-list li:hover {
+      background-color: #f0f0f0;
+    }
+    .post-location {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 9px;
+      color: #666;
+      font-style: italic;
+      white-space: nowrap;
+      max-width: 40%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding-left: 10px;
+      background: white;
+    }
+    .incident-details {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #e9ecef;
+      border-radius: 4px;
+      display: none;
+    }
+    .incident-details h2 {
+      margin-top: 0;
+    }
+    .posts-container {
+      margin-top: 20px;
+    }
+    .posts-container h2 {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Explore Incidents</h1>
+    <div class="search-bar">
+      <div class="search-inputs">
+        <input type="text" id="locationInput" placeholder="Enter location..." />
+        <select id="locationDropdown">
+          <option value="">Select location</option>
+          <option value="Mirpur DOHS">Mirpur DOHS</option>
+          <option value="Nilkhet">Nilkhet</option>
+          <option value="Mohammadpur">Mohammadpur</option>
+          <option value="Suhrawardy Udyan">Suhrawardy Udyan</option>
+          <option value="Uttara Sector 7">Uttara Sector 7</option>
+        </select>
+      </div>
+    </div>
+    <ul class="incident-list" id="incidentList"></ul>
+    <div class="incident-details" id="incidentDetails">
+      <h2 id="incidentTitle"></h2>
+      <p id="incidentDescription"></p>
+      <p><strong>Date:</strong> <span id="incidentDate"></span></p>
+    </div>
+
+    <div class="posts-container">
+      <h2>Posts</h2>
+      <ul class="post-list" id="postList"></ul>
+    </div>
+  </div>
+
+  <script>
+    const locationInput = document.getElementById('locationInput');
+    const locationDropdown = document.getElementById('locationDropdown');
+    const incidentList = document.getElementById('incidentList');
+    const incidentDetails = document.getElementById('incidentDetails');
+    const incidentTitle = document.getElementById('incidentTitle');
+    const incidentDescription = document.getElementById('incidentDescription');
+    const incidentDate = document.getElementById('incidentDate');
+    const postList = document.getElementById('postList');
+
+    // Sample data for demonstration
+    const incidents = [];
+
+    function filterIncidents(location) {
+      if (!location) {
+        return [];
+      }
+      return incidents.filter(incident => incident.location.toLowerCase() === location.toLowerCase());
+    }
+
+    function renderIncidentList(filteredIncidents) {
+      incidentList.innerHTML = '';
+      incidentDetails.style.display = 'none';
+      if (filteredIncidents.length === 0) {
+        incidentList.innerHTML = '<li>No incidents found for this location.</li>';
+        return;
+      }
+      filteredIncidents.forEach(incident => {
+        const li = document.createElement('li');
+        // Format date to readable string
+        const dateStr = new Date(incident.date).toLocaleDateString();
+        li.textContent = `${incident.title} - ${dateStr}`;
+        li.dataset.id = incident._id;
+        li.addEventListener('click', () => {
+          showIncidentDetails(incident);
+        });
+        incidentList.appendChild(li);
+      });
+    }
+
+    function showIncidentDetails(incident) {
+      incidentTitle.textContent = incident.title;
+      incidentDescription.textContent = incident.description;
+      incidentDate.textContent = incident.date;
+      incidentDetails.style.display = 'block';
+    }
+
+    function renderPostList(posts) {
+      postList.innerHTML = '';
+      if (posts.length === 0) {
+        postList.innerHTML = '<li>No posts available.</li>';
+        return;
+      }
+      // Sort posts by createdAt descending
+      posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      posts.forEach(post => {
+        const li = document.createElement('li');
+        li.textContent = `${post.userId || 'Unknown'}: ${post.content || 'Untitled Post'}`;
+        const locationSpan = document.createElement('span');
+        locationSpan.className = 'post-location';
+        locationSpan.textContent = post.location || 'Unknown location';
+        li.appendChild(locationSpan);
+        postList.appendChild(li);
+      });
+    }
+
+    // Event listeners for search input and dropdown
+    locationInput.addEventListener('input', () => {
+      const location = locationInput.value.trim();
+      locationDropdown.value = '';
+      fetchIncidents(location);
+    });
+
+    locationDropdown.addEventListener('change', () => {
+      const location = locationDropdown.value;
+      locationInput.value = location;
+      fetchIncidents(location);
+    });
+
+    function fetchIncidents(location) {
+      if (!location) {
+        renderIncidentList([]);
+        return;
+      }
+      fetch(`/api/filters/search?location=${encodeURIComponent(location)}`)
+        .then(response => response.json())
+        .then(data => {
+          console.log('Fetched incidents:', data);
+          renderIncidentList(data);
+        })
+        .catch(error => {
+          console.error('Error fetching incidents:', error);
+          renderIncidentList([]);
+        });
+    }
+
+    function fetchPosts() {
+      fetch('/post')
+        .then(response => response.json())
+        .then(data => {
+          console.log('Fetched posts:', data);
+          renderPostList(data);
+        })
+        .catch(error => {
+          console.error('Error fetching posts:', error);
+          renderPostList([]);
+        });
+    }
+
+    // Initial fetch of posts on page load
+    fetchPosts();
+  </script>
+</body>
+</html>

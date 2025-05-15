@@ -1,9 +1,15 @@
-// Models/postModel.js
 import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const postSchema = new Schema({
-  /* existing fields… */
+  userId: {
+    type: String,
+    required: true
+  },
+  content: {
+    type: String,
+    required: true
+  },
   location: { 
     type: String, 
     required: true 

@@ -1,14 +1,23 @@
 {
   "name": "alerthub",
   "version": "1.0.0",
+  "description": "",
+  "keywords": [],
+  "homepage": "https://github.com/saniyatfk28/AlertHub#readme",
+  "bugs": {
+    "url": "https://github.com/saniyatfk28/AlertHub/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saniyatfk28/AlertHub.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "start": "nodemon index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.3",
@@ -18,6 +27,6 @@
     "mongoose": "^6.13.8"
   },
   "devDependencies": {
-    "nodemon": "^2.0.22"
+    "nodemon": "^3.1.10"
   }
 }
