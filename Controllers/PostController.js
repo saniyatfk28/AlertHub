@@ -1,4 +1,4 @@
-import PostModel from "../Models/postModel.js";
+import InteractionModel from "../Models/interactionModel.js";
 import TagModel from "../Models/tagModel.js";
 import LocationModel from "../Models/locationModel.js";
 import DraftModel from "../Models/draftModel.js";
@@ -8,7 +8,7 @@ import mongoose from "mongoose";
 // -------------------- POST MANAGEMENT --------------------
 
 export const createPost = async (req, res) => {
-  const newPost = new PostModel(req.body);
+  const newPost = new InteractionModel(req.body);
   try {
     await newPost.save();
     res.status(200).json("Post created!");
@@ -21,7 +21,7 @@ export const createPost = async (req, res) => {
 export const postReporting = async (req, res) => {
   const { data } = req.body;
   try {
-    await PostModel.create({
+    await InteractionModel.create({
       title: data.title,
       details: data.details,
       category: data.category,
@@ -39,7 +39,7 @@ export const postReporting = async (req, res) => {
 export const getPost = async (req, res) => {
   const id = req.params.id;
   try {
-    const post = await PostModel.findById(id);
+    const post = await InteractionModel.findById(id);
     res.status(200).json(post);
   } catch (error) {
     res.status(500).json(error);
@@ -50,7 +50,7 @@ export const updatePost = async (req, res) => {
   const postId = req.params.id;
   const { userId } = req.body;
   try {
-    const post = await PostModel.findById(postId);
+    const post = await InteractionModel.findById(postId);
     if (post.userId === userId) {
       await post.updateOne({ $set: req.body });
       res.status(200).json("Post Updated");
@@ -66,7 +66,7 @@ export const deletePost = async (req, res) => {
   const id = req.params.id;
   const { userId } = req.body;
   try {
-    const post = await PostModel.findById(id);
+    const post = await InteractionModel.findById(id);
     if (post.userId === userId) {
       await post.deleteOne();
       res.status(200).json("Post deleted successfully");
@@ -82,7 +82,7 @@ export const likePost = async (req, res) => {
   const id = req.params.id;
   const { userId } = req.body;
   try {
-    const post = await PostModel.findById(id);
+    const post = await InteractionModel.findById(id);
     if (!post.likes.includes(userId)) {
       await post.updateOne({ $push: { likes: userId } });
       res.status(200).json("Post liked");
@@ -98,14 +98,14 @@ export const likePost = async (req, res) => {
 export const getTimelinePosts = async (req, res) => {
   const userId = req.params.id;
   try {
-    const currentUserPosts = await PostModel.find({ userId: userId });
+    const currentUserPosts = await InteractionModel.find({ userId: userId });
     const followingPosts = await UserModel.aggregate([
       {
         $match: { _id: new mongoose.Types.ObjectId(userId) },
       },
       {
         $lookup: {
-          from: "posts",
+          from: "interactions",
           localField: "following",
           foreignField: "userId",
           as: "followingPosts",
@@ -129,7 +129,7 @@ export const getTimelinePosts = async (req, res) => {
 
 export const getAllPosts = async (req, res) => {
   try {
-    const posts = await PostModel.find().sort({ createdAt: -1 });
+    const posts = await InteractionModel.find().sort({ createdAt: -1 });
     res.status(200).json(posts);
   } catch (error) {
     res.status(500).json(error);

@@ -44,6 +44,7 @@ app.use('/auth', AuthRoute);
 app.use('/user', UserRoute);
 app.use('/post', PostRoute);
 app.use('/api/post', PostRoute);  // keeping your original post route too
+app.use('/interactions', (await import('./Routes/InteractionRoute.js')).default);
 app.use('/sos', sosRoutes);
 
 // Static files middleware
@@ -51,6 +52,10 @@ app.use(express.static(path.join(process.cwd(), 'public')));
 
 // Static page routes
 app.get('/incidentfilter', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'exploreIncident.html'));
+});
+
+app.get('/incidentfiltering', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'exploreIncident.html'));
 });
 

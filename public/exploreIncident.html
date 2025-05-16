@@ -221,7 +221,9 @@
       posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       posts.forEach(post => {
         const li = document.createElement('li');
-        li.textContent = `${post.userId || 'Unknown'}: ${post.content || 'Untitled Post'}`;
+        const title = post.title || 'Untitled Post';
+        const details = post.details ? ` - ${post.details}` : '';
+        li.textContent = `${post.userId || 'Unknown'}: ${title}${details}`;
         const locationSpan = document.createElement('span');
         locationSpan.className = 'post-location';
         locationSpan.textContent = post.location || 'Unknown location';
@@ -258,9 +260,10 @@
     }
 
     function fetchPosts() {
-      fetch('/post')
+      fetch('/interactions')
         .then(response => response.json())
         .then(data => {
+          console.log("Received interactions data:", data);
           renderPostList(data);
         })
         .catch(() => {
