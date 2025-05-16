@@ -1,112 +1,178 @@
+/* Global reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* BODY: Merged styles */
+/* Using base body from file1 with some padding from file2 */
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 20px;
-    background-color: #f4f4f4;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(to right, #f85032, #e73827);
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start; /* from file2 */
+  justify-content: center;
+  padding: 20px; /* from file2 */
+  margin: 0;
 }
 
+/* Container styles: merged and differentiated */
 .container {
-    max-width: 800px;
-    width: 100%;
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 800px; /* max width from file2 */
+  padding: 20px;
+  background-color: #fff; /* from file2 */
+  border-radius: 8px; /* from file2 */
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); /* from file2 */
 }
 
-h1 {
-    text-align: center;
-    color: #333;
-    margin-bottom: 20px;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+/* Specific container for sos-form from file1 */
+.sos-form {
+  background: #fff;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  text-align: center;
 }
 
+/* Headings */
+h1, .sos-form h1 {
+  text-align: center;
+  color: #e73827; /* sos-form color */
+  margin-bottom: 10px;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1); /* from file2 */
+}
+
+h1:not(.sos-form h1) {
+  color: #333; /* file2 default h1 */
+  margin-bottom: 20px;
+}
+
+/* Paragraphs inside sos-form */
+.sos-form p {
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+/* Form styles from file2 */
 form {
-    max-width: 500px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+/* Labels */
 label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
 }
 
+/* Inputs and textarea merged */
+.sos-form input,
+.sos-form textarea,
 input[type="text"],
 input[type="email"],
 input[type="password"],
 select {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
+  width: 100%;
+  padding: 12px; /* file1 uses 12px, file2 uses 8px, taking 12px */
+  margin: 10px 0; /* file1 margin */
+  border: 1px solid #ccc; /* file2 border */
+  border-radius: 8px; /* file1 radius 8px and file2 4px, using 8px */
+  font-size: 1rem;
+  box-sizing: border-box;
+  resize: vertical;
+  min-height: 80px; /* from file1 textarea */
+  outline: none;
+  transition: border-color 0.3s ease;
 }
 
+.sos-form input:focus,
+.sos-form textarea:focus,
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+select:focus {
+  border-color: #e73827; /* from file1 */
+  box-shadow: 0 0 5px rgba(231, 56, 39, 0.3);
+}
+
+/* Buttons merged */
+.sos-button,
 button {
-    background-color: #5cb85c;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+  background-color: #e73827; /* file1 button bg */
+  color: white;
+  padding: 15px 25px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
+.sos-button:hover,
 button:hover {
-    background-color: #4cae4c;
+  background-color: #cf1e10; /* file1 hover */
 }
 
+/* Links */
 a {
-    color: #007bff;
-    text-decoration: none;
+  color: #007bff;
+  text-decoration: none;
 }
 
 a:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
-/* Styles for crime-dashboard.html */
+/* Status message from file1 */
+.status-message {
+  margin-top: 15px;
+  color: #333;
+  font-weight: bold;
+}
+
+/* Styles for crime-dashboard.html from file2 */
 h2 {
-    color: #555;
-    margin-top: 20px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 8px;
-    font-size: 1.3em;
+  color: #555;
+  margin-top: 20px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+  font-size: 1.3em;
 }
 
 canvas {
-    margin-bottom: 20px;
-    background-color: #fff;
-    padding: 10px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+  margin-bottom: 20px;
+  background-color: #fff;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
 }
 
 #downloadPieChartBtn {
-    display: block;
-    margin: 10px auto;
+  display: block;
+  margin: 10px auto;
 }
 
 ul {
-    list-style: none;
-    padding: 0;
+  list-style: none;
+  padding: 0;
 }
 
 ul li {
-    background-color: #f9f9f9;
-    padding: 12px;
-    margin-bottom: 8px;
-    border-radius: 6px;
-    box-shadow: 0 0 6px rgba(0, 0, 0, 0.04);
-    font-size: 1.1em;
-    color: #444;
+  background-color: #f9f9f9;
+  padding: 12px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.04);
+  font-size: 1.1em;
+  color: #444;
 }

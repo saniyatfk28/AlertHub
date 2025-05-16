@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AlertHub - Social Media</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    header {
+      background-color: #2c3e50;
+      color: white;
+      padding: 15px 0;
+      margin-bottom: 20px;
+      border-radius: 5px;
+    }
+    header h1 {
+      margin: 0;
+      padding: 0 20px;
+    }
+    .nav-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .btn {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+    .btn-primary {
+      background-color: #3498db;
+      color: white;
+    }
+    .btn-danger {
+      background-color: #e74c3c;
+      color: white;
+    }
+    .btn-success {
+      background-color: #2ecc71;
+      color: white;
+    }
+    .btn-warning {
+      background-color: #f39c12;
+      color: white;
+    }
+    .btn:hover {
+      opacity: 0.9;
+    }
+    .posts-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .post-card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      padding: 15px;
+    }
+    .post-card img {
+      max-width: 100%;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+    .post-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .post-category {
+      background-color: #3498db;
+      color: white;
+      padding: 3px 8px;
+      border-radius: 15px;
+      font-size: 12px;
+    }
+    .post-location {
+      color: #7f8c8d;
+      font-size: 14px;
+    }
+    .post-title {
+      font-weight: bold;
+      margin: 5px 0;
+    }
+    .post-details {
+      color: #34495e;
+      font-size: 14px;
+    }
+    .no-posts {
+      text-align: center;
+      padding: 40px;
+      color: #7f8c8d;
+    }
+    .draft-badge {
+      background-color: #f39c12;
+      color: white;
+      padding: 3px 8px;
+      border-radius: 15px;
+      font-size: 12px;
+      margin-left: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>AlertHub</h1>
+    </header>
+
+    <div class="nav-buttons">
+      <button class="btn btn-primary" onclick="window.location.href='PostForm.html'">Create New Post</button>
+      <button class="btn btn-success" onclick="retrieveDraft()">Retrieve Draft</button>
+      <button class="btn btn-danger" onclick="window.location.href='sos.html'">SOS</button>
+      <button class="btn btn-warning" onclick="window.location.href='analytics.html'">Analytics</button>
+      <button class="btn btn-primary" onclick="window.location.href='location-filter.html'">Location-Based Filter</button>
+    </div>
+
+    <h2>Recent Posts</h2>
+    <div class="posts-container" id="postsContainer">
+      <!-- Posts will be loaded here -->
+      <div class="no-posts">Loading posts...</div>
+    </div>
+  </div>
+
+  <script>
+    // Function to load published posts (status = 1)
+    async function loadPosts() {
+      try {
+        const response = await fetch('http://localhost:8000/api/post/get-posts');
+        const posts = await response.json();
+        
+        const postsContainer = document.getElementById('postsContainer');
+        
+        if (posts.length === 0) {
+          postsContainer.innerHTML = '<div class="no-posts">No posts available. Be the first to post!</div>';
+          return;
+        }
+        
+        postsContainer.innerHTML = '';
+        
+        posts.forEach(post => {
+          const postCard = document.createElement('div');
+          postCard.className = 'post-card';
+          
+          let imageHtml = '';
+          if (post.image) {
+            imageHtml = `<img src="${post.image}" alt="Post image">`;
+          }
+          
+          postCard.innerHTML = `
+            <div class="post-header">
+              <div>
+                <span class="post-category">${post.category || 'Uncategorized'}</span>
+                ${post.status === 0 ? '<span class="draft-badge">Draft</span>' : ''}
+              </div>
+              <span class="post-location">${post.address || 'Unknown location'}</span>
+            </div>
+            <div class="post-title">${post.title || 'No title'}</div>
+            <div class="post-details">${post.details || 'No details provided'}</div>
+            ${imageHtml}
+          `;
+          
+          postsContainer.appendChild(postCard);
+        });
+
+        // Check if we were redirected from a successful post
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('fromPost') === 'true') {
+          // Scroll to the top to show the new post
+          window.scrollTo(0, 0);
+        }
+      } catch (error) {
+        console.error('Error loading posts:', error);
+        document.getElementById('postsContainer').innerHTML = 
+          '<div class="no-posts">Error loading posts. Please try again later.</div>';
+      }
+    }
+
+    // Function to retrieve draft (status = 0)
+    async function retrieveDraft() {
+      try {
+        const response = await fetch('http://localhost:8000/api/post/get-drafts');
+        const drafts = await response.json();
+        
+        if (drafts && drafts.length > 0) {
+          // For simplicity, we'll take the most recent draft
+          const mostRecentDraft = drafts[drafts.length - 1];
+          
+          // Store draft data in localStorage to be used by the PostForm page
+          localStorage.setItem('draftData', JSON.stringify({
+            title: mostRecentDraft.title,
+            details: mostRecentDraft.details,
+            category: mostRecentDraft.category,
+            address: mostRecentDraft.address,
+            image: mostRecentDraft.image
+          }));
+          
+          // Redirect to PostForm
+          window.location.href = 'PostForm.html';
+        } else {
+          alert('No drafts found. Creating new post instead.');
+          window.location.href = 'PostForm.html';
+        }
+      } catch (error) {
+        console.error('Error retrieving drafts:', error);
+        alert('Error retrieving drafts. Creating new post instead.');
+        window.location.href = 'PostForm.html';
+      }
+    }
+
+    // Load posts when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      loadPosts();
+      
+      // Check for success message from post creation
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('postSuccess')) {
+        alert('Post created successfully!');
+        // Clean up the URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SOS Alert Hub</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <form id="sosForm" class="sos-form">
+      <h1>SOS Alert Hub</h1>
+      <p>Fill in your details and press the red button to send an SOS alert.</p>
+
+      <input type="text" id="name" placeholder="Your Name" required />
+      <input type="text" id="phone" placeholder="Your Phone (optional)" />
+      <input type="text" id="location" placeholder="Your Location" required />
+      <textarea id="message" placeholder="Describe your emergency (optional)"></textarea>
+
+      <button type="submit" class="sos-button">🚨 Send SOS 🚨</button>
+      <div id="status" class="status-message"></div>
+    </form>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+

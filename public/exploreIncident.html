@@ -94,10 +94,45 @@
     .posts-container h2 {
       margin-bottom: 10px;
     }
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #333;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+    .nav-links a {
+      color: white;
+      margin-right: 20px;
+      text-decoration: none;
+    }
+    .logout-button {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .logout-button:hover {
+      background-color: #b02a37;
+    }
   </style>
 </head>
 <body>
   <div class="container">
+    <nav class="nav-container">
+      <div class="nav-links">
+        <a href="PostForm.HTML">Create Post</a>
+        <a href="DraftForm.HTML">Draft</a>
+        <a href="sos.html">SoS</a>
+        <a href="crime-dashboard.html">Analytics</a>
+      </div>
+      <button class="logout-button" id="logoutBtn">Logout</button>
+    </nav>
     <h1>Explore Incidents</h1>
     <div class="search-bar">
       <div class="search-inputs">
@@ -126,6 +161,12 @@
   </div>
 
   <script>
+    const logoutBtn = document.getElementById('logoutBtn');
+    logoutBtn.addEventListener('click', () => {
+      localStorage.clear();
+      window.location.href = 'login.html';
+    });
+
     const locationInput = document.getElementById('locationInput');
     const locationDropdown = document.getElementById('locationDropdown');
     const incidentList = document.getElementById('incidentList');
@@ -154,7 +195,6 @@
       }
       filteredIncidents.forEach(incident => {
         const li = document.createElement('li');
-        // Format date to readable string
         const dateStr = new Date(incident.date).toLocaleDateString();
         li.textContent = `${incident.title} - ${dateStr}`;
         li.dataset.id = incident._id;
@@ -178,7 +218,6 @@
         postList.innerHTML = '<li>No posts available.</li>';
         return;
       }
-      // Sort posts by createdAt descending
       posts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       posts.forEach(post => {
         const li = document.createElement('li');
@@ -191,7 +230,6 @@
       });
     }
 
-    // Event listeners for search input and dropdown
     locationInput.addEventListener('input', () => {
       const location = locationInput.value.trim();
       locationDropdown.value = '';
@@ -212,11 +250,9 @@
       fetch(`/api/filters/search?location=${encodeURIComponent(location)}`)
         .then(response => response.json())
         .then(data => {
-          console.log('Fetched incidents:', data);
           renderIncidentList(data);
         })
-        .catch(error => {
-          console.error('Error fetching incidents:', error);
+        .catch(() => {
           renderIncidentList([]);
         });
     }
@@ -225,16 +261,13 @@
       fetch('/post')
         .then(response => response.json())
         .then(data => {
-          console.log('Fetched posts:', data);
           renderPostList(data);
         })
-        .catch(error => {
-          console.error('Error fetching posts:', error);
+        .catch(() => {
           renderPostList([]);
         });
     }
 
-    // Initial fetch of posts on page load
     fetchPosts();
   </script>
 </body>

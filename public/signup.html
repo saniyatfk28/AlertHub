@@ -50,7 +50,7 @@
             const password = document.getElementById('password').value;
 
             try {
-                const response = await fetch('/register', {
+                const response = await fetch('/auth/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -60,6 +60,7 @@
 
                 if (response.ok) {
                     alert('Sign up successful!');
+                    window.location.href = '/incidentfilter';
                 } else {
                     const errorData = await response.json();
                     alert('Sign up failed: ' + errorData.message);

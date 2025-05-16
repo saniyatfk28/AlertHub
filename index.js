@@ -1,58 +1,55 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import express from "express";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
-import dotenv from "dotenv";
+import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
+
 import AuthRoute from './Routes/AuthRoute.js';
 import UserRoute from './Routes/UserRoute.js';
 import PostRoute from './Routes/PostRoute.js';
-import path from 'path';
 import statsRoutes from './Routes/statsRoutes.js';
-import { fileURLToPath } from 'url';
-
 import filterRouter from './Controllers/filter.js';
-// const incidentRouter = require('./Controllers/incident'); // Removed because file does not exist
+import sosRoutes from './Routes/sosRoutes.js';
+
+import connectDB from "./config/db.js";  // your DB connect module
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8000;
 
-// Middleware
-app.use(bodyParser.json({ limit: "30mb", extended: true }));
-app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
-app.use(express.json()); // From first config
+// Connect to database using your custom connectDB
+connectDB();
 
-// Static files
-app.use(express.static(path.join(process.cwd(), 'public'))); // From first config
-app.use(express.static(path.join(process.cwd(), 'public'))); // From second config
+// Middleware setup
+app.use(bodyParser.json({ limit: "1000mb", extended: true }));
+app.use(bodyParser.urlencoded({ limit: "1000mb", extended: true }));
+app.use(express.json());
 
-// Database connection
-dotenv.config();
+app.use(cors({
+  origin: ["http://localhost:3000", "null"],
+  methods: ["POST", "GET", "PUT", "DELETE"],
+  credentials: true,
+}));
 
-console.log('MONGO_DB:', process.env.MONGO_DB); // Debug log to check env variable
-
-mongoose.set('strictQuery', false);
-
-mongoose
-  .connect(process.env.MONGO_DB, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() =>
-    app.listen(PORT, () =>
-      console.log(`Server running on port ${PORT}`)
-    )
-  )
-  .catch((error) => console.log(error));
-
+// Routes
 app.use('/api/filters', filterRouter);
-// app.use('/api/incidents', incidentRouter); // Removed because file does not exist
 app.use('/api/stats', statsRoutes);
 app.use('/auth', AuthRoute);
 app.use('/user', UserRoute);
 app.use('/post', PostRoute);
+app.use('/api/post', PostRoute);  // keeping your original post route too
+app.use('/sos', sosRoutes);
 
+// Static files middleware
+app.use(express.static(path.join(process.cwd(), 'public')));
+
+// Static page routes
 app.get('/incidentfilter', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'exploreIncident.html'));
 });
@@ -71,4 +68,9 @@ app.get('/monthly-crimes', (req, res) => {
 
 app.get('/signup', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'signup.html'));
+});
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
