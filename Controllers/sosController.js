@@ -1,41 +1,41 @@
-const SosCall = require('../models/SosCall');
-const nodemailer = require('nodemailer');
+import SosCall from "../Models/SosCall.js";
+import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  service: "gmail",
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
+    pass: process.env.EMAIL_PASS,
+  },
 });
 
-exports.createSos = async (req, res) => {
+export const createSos = async (req, res) => {
   try {
-    const { name, phone, message, location } = req.body;
+    const { callerName, phone, message, location } = req.body;
 
-    if (!name || !location) {
-      return res.status(400).json({ error: 'Name and location are required' });
+    if (!callerName || !location) {
+      return res.status(400).json({ error: "Name and location are required" });
     }
 
-    const sosCall = new SosCall({ name, phone, message, location });
+    const sosCall = new SosCall({ name: callerName, phone, message, location });
     await sosCall.save();
 
     const mailOptions = {
       from: `SOS Alert <${process.env.EMAIL_USER}>`,
       to: process.env.EMAIL_USER,
-      subject: `[SOS ALERT] ${name} triggered an SOS from ${location}`,
-      text: `SOS Triggered by: ${name}\nPhone: ${phone || 'N/A'}\nLocation: ${location}\nMessage: ${message || 'None'}\n\nPlease respond immediately!`
+      subject: `[SOS ALERT] ${callerName} triggered an SOS from ${location}`,
+      text: `SOS Triggered by: ${callerName}\nPhone: ${phone || "N/A"}\nLocation: ${location}\nMessage: ${message || "None"}\n\nPlease respond immediately!`,
     };
 
     await transporter.sendMail(mailOptions);
 
     res.status(201).json({
       success: true,
-      message: 'SOS call sent and saved',
-      sosCall
+      message: "SOS call sent and saved",
+      sosCall,
     });
   } catch (err) {
-    console.error('SOS Error:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("SOS Error:", err);
+    res.status(500).json({ error: "Internal server error" });
   }
 };

@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 const sosCallSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -8,4 +8,5 @@ const sosCallSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('SosCall', sosCallSchema);
+const SosCall = mongoose.model("SosCall", sosCallSchema);
+export default SosCall;

@@ -1,7 +1,8 @@
-const express = require('express');
+import express from "express";
+import { createSos } from "../Controllers/sosController.js";
+
 const router = express.Router();
-const { createSos } = require('../controllers/sosController');
 
-router.post('/', createSos);
+router.post("/", createSos);
 
-module.exports = router;
+export default router;

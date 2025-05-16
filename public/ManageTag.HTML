@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Manage Tags</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    .manage-tags {
+      max-width: 600px;
+      margin: auto;
+    }
+
+    .title {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    .input-section {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .tag-input {
+      flex: 1;
+      padding: 8px;
+      font-size: 16px;
+    }
+
+    .add-button {
+      padding: 8px 12px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .tag-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .tag-table th, .tag-table td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script>
+    const { useState, useEffect } = React;
+
+    function ManageTags() {
+      const [tag, setTag] = useState('');
+      const [tags, setTags] = useState([]);
+
+      const fetchTags = async () => {
+        try {
+          const response = await axios.get('http://localhost:8000/api/post/get-tags');
+          setTags(response.data);
+        } catch (error) {
+          console.log("Error occurred while fetching tags");
+        }
+      };
+
+      useEffect(() => {
+        fetchTags();
+      }, []);
+
+      const handleAddTag = async () => {
+        try {
+          await axios.post('http://localhost:8000/api/post/post-tag', { tag });
+          setTag('');
+          fetchTags();
+        } catch (error) {
+          console.log("Error occurred while adding tag");
+        }
+      };
+
+      return React.createElement('div', { className: 'manage-tags' },
+        React.createElement('h2', { className: 'title' }, 'Manage Tags'),
+        React.createElement('div', { className: 'input-section' },
+          React.createElement('input', {
+            type: 'text',
+            value: tag,
+            onChange: (e) => setTag(e.target.value),
+            placeholder: 'Enter a tag',
+            className: 'tag-input'
+          }),
+          React.createElement('button', {
+            onClick: handleAddTag,
+            className: 'add-button'
+          }, 'Add Tag')
+        ),
+        tags.length > 0 && React.createElement('table', { className: 'tag-table' },
+          React.createElement('thead', null,
+            React.createElement('tr', null,
+              React.createElement('th', null, '#'),
+              React.createElement('th', null, 'Tag')
+            )
+          ),
+          React.createElement('tbody', null,
+            tags.map((item, index) =>
+              React.createElement('tr', { key: index },
+                React.createElement('td', null, index + 1),
+                React.createElement('td', null, item.tag)
+              )
+            )
+          )
+        )
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(React.createElement(ManageTags));
+  </script>
+</body>
+</html>

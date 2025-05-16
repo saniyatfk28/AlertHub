@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Post Form</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    .nav-container {
+      display: flex;
+      justify-content: flex-end;
+      background-color: #333;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+    .logout-button {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .logout-button:hover {
+      background-color: #b02a37;
+    }
+    .post-form {
+      max-width: 600px;
+      margin: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .post-form input,
+    .post-form select,
+    .post-form textarea {
+      padding: 8px;
+      font-size: 16px;
+    }
+    .post-button {
+      padding: 10px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .post-button:hover {
+      background-color: #0056b3;
+    }
+    .image-preview img {
+      max-width: 200px;
+      max-height: 200px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav-container">
+    <button class="logout-button" id="logoutBtn">Logout</button>
+  </nav>
+  <div id="root"></div>
+
+  <script>
+    const logoutBtn = document.getElementById('logoutBtn');
+    logoutBtn.addEventListener('click', () => {
+      localStorage.clear();
+      window.location.href = 'login.html';
+    });
+
+    const { useState, useEffect, useRef } = React;
+
+    function PostForm() {
+      const [title, setTitle] = useState('');
+      const [details, setDetails] = useState('');
+      const [category, setCategory] = useState('');
+      const [address, setAddress] = useState('');
+      const [imageBase64, setImageBase64] = useState('');
+      const [tags, setTags] = useState([]);
+      const [locations, setLocations] = useState([]);
+      const [isEditingDraft, setIsEditingDraft] = useState(false);
+      const [draftId, setDraftId] = useState(null);
+      const hasPosted = useRef(false);
+
+      const titleRef = useRef('');
+      const detailsRef = useRef('');
+      const categoryRef = useRef('');
+      const addressRef = useRef('');
+      const imageRef = useRef('');
+
+      useEffect(() => { titleRef.current = title }, [title]);
+      useEffect(() => { detailsRef.current = details }, [details]);
+      useEffect(() => { categoryRef.current = category }, [category]);
+      useEffect(() => { addressRef.current = address }, [address]);
+      useEffect(() => { imageRef.current = imageBase64 }, [imageBase64]);
+
+      useEffect(() => {
+        const draftToEdit = localStorage.getItem('editDraft');
+        if (draftToEdit) {
+          const draft = JSON.parse(draftToEdit);
+          setTitle(draft.title || '');
+          setDetails(draft.details || '');
+          setCategory(draft.category || '');
+          setAddress(draft.address || '');
+          setImageBase64(draft.image || '');
+          setDraftId(draft._id || null);
+          setIsEditingDraft(true);
+          localStorage.removeItem('editDraft');
+        }
+
+        axios.get('http://localhost:8000/api/post/get-tags')
+          .then(res => setTags(res.data))
+          .catch(() => console.log('Error fetching tags'));
+        axios.get('http://localhost:8000/api/post/get-location')
+          .then(res => setLocations(res.data))
+          .catch(() => console.log('Error fetching locations'));
+      }, []);
+
+      const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onloadend = () => setImageBase64(reader.result);
+        reader.readAsDataURL(file);
+      };
+
+      const submitPost = async (status) => {
+        const data = {
+          title,
+          details,
+          category,
+          location: address,
+          address,
+          status,
+          image: imageBase64,
+        };
+        if (!title && !details && !category && !address && !imageBase64) return;
+
+        try {
+          if (isEditingDraft && draftId) {
+            await axios.put(`http://localhost:8000/api/post/update-draft/${draftId}`, { data });
+          } else {
+            await axios.post('http://localhost:8000/api/post/post-reporting', { data });
+          }
+          hasPosted.current = true;
+          window.location.href = '/incidentfilter';
+        } catch (err) {
+          console.error('Post error:', err);
+        }
+      };
+
+      const handlePostClick = async () => {
+        await submitPost(1);
+      };
+
+      const handleSaveDraft = async () => {
+        await submitPost(0);
+      };
+
+      const handleBackClick = () => {
+        window.history.back();
+      };
+
+      useEffect(() => {
+        const handleBeforeUnload = () => {
+          if (!hasPosted.current) {
+            const data = {
+              title: titleRef.current,
+              details: detailsRef.current,
+              category: categoryRef.current,
+              address: addressRef.current,
+              image: imageRef.current,
+              status: 0,
+            };
+            const blob = new Blob([JSON.stringify({ data })], { type: 'application/json' });
+            navigator.sendBeacon('http://localhost:8000/api/post/post-reporting', blob);
+          }
+        };
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+      }, []);
+
+      return React.createElement("div", { className: "post-form" },
+        React.createElement("input", {
+          type: "text",
+          placeholder: "Enter a title",
+          value: title,
+          onChange: e => setTitle(e.target.value)
+        }),
+        React.createElement("textarea", {
+          placeholder: "Enter details",
+          value: details,
+          onChange: e => setDetails(e.target.value)
+        }),
+        React.createElement("select", {
+          value: category,
+          onChange: e => setCategory(e.target.value)
+        },
+          React.createElement("option", { value: "", disabled: true }, "Select a Tag"),
+          tags.map((tag, i) => React.createElement("option", { key: i, value: tag.tag }, tag.tag))
+        ),
+        React.createElement("select", {
+          value: address,
+          onChange: e => setAddress(e.target.value)
+        },
+          React.createElement("option", { value: "", disabled: true }, "Select a Location"),
+          locations.map((loc, i) => React.createElement("option", { key: i, value: loc.location }, loc.location))
+        ),
+        React.createElement("input", {
+          type: "file",
+          accept: "image/*",
+          onChange: handleImageChange
+        }),
+        imageBase64 && React.createElement("div", { className: "image-preview" },
+          React.createElement("img", { src: imageBase64, alt: "Preview" })
+        ),
+        React.createElement("button", {
+          className: "post-button",
+          onClick: handlePostClick
+        }, isEditingDraft ? "Update Post" : "Post"),
+        React.createElement("button", {
+          className: "post-button",
+          style: { backgroundColor: "#6c757d" },
+          onClick: handleSaveDraft
+        }, isEditingDraft ? "Update Draft" : "Save Draft"),
+        React.createElement("button", {
+          className: "post-button",
+          style: { backgroundColor: "#dc3545" },
+          onClick: handleBackClick
+        }, "Back")
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(React.createElement(PostForm));
+  </script>
+</body>
+</html>

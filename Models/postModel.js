@@ -1,18 +1,30 @@
 import mongoose from "mongoose";
 
-const postSchema = mongoose.Schema(
+const postSchema = new mongoose.Schema(
   {
-    userId: { type: String, required: true },
-    desc: String,
-    likes: [],
-    image: String,
-    location: String,
-    crimeType: String,
+    title: {
+      type: String,
+    },
+    details: {
+      type: String,
+    },
+    category: {
+      type: String,
+    },
+    address: {
+      type: String,
+    },
+    status: {
+      type: Number, // e.g., 0 = draft, 1 = submitted
+    },
+    image: {
+      type: String,
+    },
   },
   {
-    timestamps: true,
+    timestamps: true, // adds createdAt and updatedAt
   }
 );
 
-var PostModel = mongoose.model("Posts", postSchema);
-export default PostModel;
+const ReportPostModel = mongoose.model("posts", postSchema);
+export default ReportPostModel;

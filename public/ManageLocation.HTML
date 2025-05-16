@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Manage Locations</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <style>
+    .manage-tags {
+      padding: 20px;
+      font-family: Arial, sans-serif;
+    }
+    .title {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    .input-section {
+      margin-bottom: 20px;
+    }
+    .tag-input {
+      padding: 8px;
+      font-size: 16px;
+    }
+    .add-button {
+      padding: 8px 12px;
+      font-size: 16px;
+      margin-left: 10px;
+    }
+    .tag-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .tag-table th, .tag-table td {
+      border: 1px solid #ccc;
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script>
+    const { useState, useEffect } = React;
+
+    function ManageLocation() {
+      const [location, setLocation] = useState('');
+      const [locations, setLocations] = useState([]);
+
+      const fetchTags = async () => {
+        try {
+          const response = await axios.get('http://localhost:8000/api/post/get-location');
+          setLocations(response.data);
+        } catch (error) {
+          console.log("Error occurred while fetching locations");
+        }
+      };
+
+      useEffect(() => {
+        fetchTags();
+      }, []);
+
+      const handleAddTag = async () => {
+        try {
+          await axios.post('http://localhost:8000/api/post/post-location', { location });
+          setLocation('');
+          fetchTags();
+        } catch (error) {
+          console.log("Error occurred while adding location");
+        }
+      };
+
+      return React.createElement('div', { className: 'manage-tags' },
+        React.createElement('h2', { className: 'title' }, 'Manage Locations'),
+        React.createElement('div', { className: 'input-section' },
+          React.createElement('input', {
+            type: 'text',
+            value: location,
+            onChange: (e) => setLocation(e.target.value),
+            placeholder: 'Enter a location',
+            className: 'tag-input'
+          }),
+          React.createElement('button', {
+            onClick: handleAddTag,
+            className: 'add-button'
+          }, 'Add Location')
+        ),
+        locations.length > 0 && React.createElement('table', { className: 'tag-table' },
+          React.createElement('thead', null,
+            React.createElement('tr', null,
+              React.createElement('th', null, '#'),
+              React.createElement('th', null, 'Location')
+            )
+          ),
+          React.createElement('tbody', null,
+            locations.map((item, index) =>
+              React.createElement('tr', { key: index },
+                React.createElement('td', null, index + 1),
+                React.createElement('td', null, item.location)
+              )
+            )
+          )
+        )
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(React.createElement(ManageLocation));
+  </script>
+</body>
+</html>
