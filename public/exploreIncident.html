@@ -263,7 +263,6 @@
       fetch('/interactions')
         .then(response => response.json())
         .then(data => {
-          console.log("Received interactions data:", data);
           renderPostList(data);
         })
         .catch(() => {

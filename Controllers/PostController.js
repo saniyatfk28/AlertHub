@@ -1,4 +1,4 @@
-import InteractionModel from "../Models/interactionModel.js";
+import PostModel from "../Models/postModel.js";
 import TagModel from "../Models/tagModel.js";
 import LocationModel from "../Models/locationModel.js";
 import DraftModel from "../Models/draftModel.js";
@@ -8,7 +8,7 @@ import mongoose from "mongoose";
 // -------------------- POST MANAGEMENT --------------------
 
 export const createPost = async (req, res) => {
-  const newPost = new InteractionModel(req.body);
+  const newPost = new PostModel(req.body);
   try {
     await newPost.save();
     res.status(200).json("Post created!");
@@ -21,7 +21,7 @@ export const createPost = async (req, res) => {
 export const postReporting = async (req, res) => {
   const { data } = req.body;
   try {
-    await InteractionModel.create({
+    await PostModel.create({
       title: data.title,
       details: data.details,
       category: data.category,

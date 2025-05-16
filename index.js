@@ -44,7 +44,6 @@ app.use('/auth', AuthRoute);
 app.use('/user', UserRoute);
 app.use('/post', PostRoute);
 app.use('/api/post', PostRoute);  // keeping your original post route too
-app.use('/interactions', (await import('./Routes/InteractionRoute.js')).default);
 app.use('/sos', sosRoutes);
 
 // Static files middleware
