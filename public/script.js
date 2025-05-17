@@ -2,14 +2,14 @@ document.getElementById('sosForm').addEventListener('submit', async (e) => {
   e.preventDefault();
 
   const sosData = {
-    name: document.getElementById('name').value,
+    callerName: document.getElementById('name').value,
     phone: document.getElementById('phone').value,
     location: document.getElementById('location').value,
     message: document.getElementById('message').value
   };
 
   try {
-    const res = await fetch('http://localhost:5000/api/sos', {
+    const res = await fetch('http://localhost:8080/sos', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(sosData)
@@ -21,3 +21,4 @@ document.getElementById('sosForm').addEventListener('submit', async (e) => {
     document.getElementById('status').innerText = 'Error sending SOS';
   }
 });
+
