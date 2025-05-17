@@ -1,0 +1,150 @@
+x<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin - SoS Calls</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f9f9f9;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #eee;
+    }
+    button {
+      margin-right: 5px;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    .resolve-btn {
+      background-color: #28a745;
+      color: white;
+    }
+    .reject-btn {
+      background-color: #dc3545;
+      color: white;
+    }
+    .status-pending {
+      color: orange;
+      font-weight: bold;
+    }
+    .status-resolved {
+      color: green;
+      font-weight: bold;
+    }
+    .status-rejected {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Admin - SoS Calls</h1>
+  <table id="sosTable">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Phone</th>
+        <th>Message</th>
+        <th>Location</th>
+        <th>Status</th>
+        <th>Created At</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- SoS calls will be populated here -->
+    </tbody>
+  </table>
+
+  <script>
+    async function fetchSosCalls() {
+      try {
+        const res = await fetch('/sos/admin');
+        const sosCalls = await res.json();
+        const tbody = document.querySelector('#sosTable tbody');
+        tbody.innerHTML = '';
+
+        sosCalls.forEach(call => {
+          const tr = document.createElement('tr');
+
+          tr.innerHTML = `
+            <td>${call.name}</td>
+            <td>${call.phone || ''}</td>
+            <td>${call.message || ''}</td>
+            <td>${call.location}</td>
+            <td class="status-${call.status}">${call.status}</td>
+            <td>${new Date(call.createdAt).toLocaleString()}</td>
+            <td>
+          ${call.status === 'pending' ? `
+                <button class="resolve-btn" onclick="updateStatus('${call._id}', 'resolved')">Resolve</button>
+                <button class="reject-btn" onclick="rejectCall('${call._id}', this)">Reject</button>
+          </td>
+          ` : ''}
+          `;
+
+          tbody.appendChild(tr);
+        });
+      } catch (error) {
+        console.error('Error fetching SoS calls:', error);
+      }
+    }
+
+    async function updateStatus(id, status) {
+      try {
+        const res = await fetch(`/sos/admin/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status })
+        });
+        if (res.ok) {
+          fetchSosCalls();
+        } else {
+          console.error('Failed to update status');
+        }
+      } catch (error) {
+        console.error('Error updating status:', error);
+      }
+    }
+
+    fetchSosCalls();
+
+    async function rejectCall(id, button) {
+      try {
+        const res = await fetch(`/sos/admin/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'rejected' })
+        });
+        if (res.ok) {
+          // Remove the row from the table
+          const row = button.closest('tr');
+          row.parentNode.removeChild(row);
+        } else {
+          console.error('Failed to update status');
+        }
+      } catch (error) {
+        console.error('Error updating status:', error);
+      }
+    }
+  </script>
+</body>
+</html>
