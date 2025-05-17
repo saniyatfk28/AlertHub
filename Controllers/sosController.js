@@ -39,3 +39,35 @@ export const createSos = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
+export const getAllSosCalls = async (req, res) => {
+  try {
+    const sosCalls = await SosCall.find().sort({ createdAt: -1 });
+    res.status(200).json(sosCalls);
+  } catch (err) {
+    console.error("Get All SOS Calls Error:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const updateSosCallStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!['pending', 'resolved', 'rejected'].includes(status)) {
+      return res.status(400).json({ error: "Invalid status value" });
+    }
+
+    const sosCall = await SosCall.findByIdAndUpdate(id, { status }, { new: true });
+
+    if (!sosCall) {
+      return res.status(404).json({ error: "SOS call not found" });
+    }
+
+    res.status(200).json({ message: "Status updated", sosCall });
+  } catch (err) {
+    console.error("Update SOS Call Status Error:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
