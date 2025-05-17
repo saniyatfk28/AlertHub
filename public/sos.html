@@ -1,164 +1,27 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>SoS Call</title>
-    <link rel="stylesheet" href="style.css">
-    <style>
-      .nav-container {
-        display: flex;
-        justify-content: flex-start;
-        background-color: #333;
-        padding: 10px;
-        border-radius: 5px;
-        margin-bottom: 20px;
-      }
-      .back-button {
-        background-color: #6c757d;
-        color: white;
-        border: none;
-        padding: 6px 12px;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 14px;
-      }
-      .back-button:hover {
-        background-color: #5a6268;
-      }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SOS Alert Hub</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <nav class="nav-container">
-    <button class="back-button" id="backBtn">Back</button>
-  </nav>
-  <h1>SoS Call</h1>
-  <form id="sosForm">
-      <label for="callerName">Your Name:</label>
-      <input type="text" id="callerName" name="callerName" required><br><br>
+  <div class="container">
+    <form id="sosForm" class="sos-form">
+      <h1>SOS Alert Hub</h1>
+      <p>Fill in your details and press the red button to send an SOS alert.</p>
 
-      <label for="location">Location:</label>
-      <input type="text" id="location" name="location" required><br><br>
+      <input type="text" id="name" placeholder="Your Name" required pattern="[A-Za-z\s]+" title="Name should contain only letters and spaces" />
+      <input type="tel" id="phone" placeholder="Your Phone (11 digits)" required pattern="\d{11}" title="Phone number must be exactly 11 digits" />
+      <input type="text" id="location" placeholder="Your Location" required />
+      <textarea id="message" placeholder="Describe your emergency"></textarea>
 
-      <label for="message">Message:</label><br>
-      <textarea id="message" name="message" rows="4" cols="50" required></textarea><br><br>
+      <button type="submit" class="sos-button">🚨 Send SOS 🚨</button>
+      <div id="status" class="status-message"></div>
+    </form>
+  </div>
 
-      <button type="submit">Send SoS</button>
-  </form>
-
-  <script>
-    const backBtn = document.getElementById('backBtn');
-    backBtn.addEventListener('click', () => {
-      window.history.back();
-    });
-
-    document.getElementById('sosForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const callerName = document.getElementById('callerName').value;
-        const location = document.getElementById('location').value;
-        const message = document.getElementById('message').value;
-
-        try {
-            const response = await fetch('/sos', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ callerName, location, message })
-            });
-
-            if (response.ok) {
-                alert('SoS call sent successfully!');
-                document.getElementById('sosForm').reset();
-            } else {
-                const errorData = await response.json();
-                alert('Failed to send SoS call: ' + errorData.message);
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Failed to send SoS call: ' + error);
-        }
-    });
-  </script>
-</body>
-</html>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>SoS Call</title>
-    <link rel="stylesheet" href="style.css">
-    <style>
-      .nav-container {
-        display: flex;
-        justify-content: flex-start;
-        background-color: #333;
-        padding: 10px;
-        border-radius: 5px;
-        margin-bottom: 20px;
-      }
-      .back-button {
-        background-color: #6c757d;
-        color: white;
-        border: none;
-        padding: 6px 12px;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 14px;
-      }
-      .back-button:hover {
-        background-color: #5a6268;
-      }
-    </style>
-</head>
-<body>
-  <nav class="nav-container">
-    <button class="back-button" id="backBtn">Back</button>
-  </nav>
-  <h1>SoS Call</h1>
-  <form id="sosForm">
-      <label for="callerName">Your Name:</label>
-      <input type="text" id="callerName" name="callerName" required><br><br>
-
-      <label for="location">Location:</label>
-      <input type="text" id="location" name="location" required><br><br>
-
-      <label for="message">Message:</label><br>
-      <textarea id="message" name="message" rows="4" cols="50" required></textarea><br><br>
-
-      <button type="submit">Send SoS</button>
-  </form>
-
-  <script>
-    const backBtn = document.getElementById('backBtn');
-    backBtn.addEventListener('click', () => {
-      window.history.back();
-    });
-
-    document.getElementById('sosForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const callerName = document.getElementById('callerName').value;
-        const location = document.getElementById('location').value;
-        const message = document.getElementById('message').value;
-
-        try {
-            const response = await fetch('/sos', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ callerName, location, message })
-            });
-
-            if (response.ok) {
-                alert('SoS call sent successfully!');
-                document.getElementById('sosForm').reset();
-            } else {
-                const errorData = await response.json();
-                alert('Failed to send SoS call: ' + errorData.message);
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('Failed to send SoS call: ' + error);
-        }
-    });
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
